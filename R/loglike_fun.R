@@ -1,3 +1,17 @@
+#' Calculates the log-likelihood
+#'
+#' @param kmax :int
+#' @param k :int
+#' @param sig2 :num
+#' @param a : vec
+#' @param x :vec
+#' @param X :matrix
+#'
+#' @return the log likelihood
+#' @export
+#'
+#' @examples
+#' will add soon
 loglike_fun = function(kmax,k,sig2,a,x,X){
   # calculate mean vector:
   m = X[,1:k,drop = FALSE]%*%a[1:k]
