@@ -1,3 +1,18 @@
+#' Function that performs a birth step
+#'
+#' @param k : int
+#' @param k_new : int
+#' @param a vec
+#' @param sig2 : number
+#' @param x :vector
+#' @param X : matrix
+#' @param kmax :int
+#'
+#' @return a list with updated a and k values
+#' @export
+#'
+#' @examples
+#' Will add soon
 birth_fun = function(k,k_new,a,sig2,x, X, kmax){
   nu = rnorm(1, mean = 0, sd = 0.3)
   a_prop = a
