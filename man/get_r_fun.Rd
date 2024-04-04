@@ -13,6 +13,12 @@ get_r_fun(k_int, k_prop, kmax)
 
 \item{kmax}{: integer greater than 0, max ar(k) process that can be checked}
 }
+\value{
+probability of either birth or death
+}
 \description{
 Function that calculates the r_(i,j) probability in the acceptance ratio
+}
+\examples{
+will add soon
 }
