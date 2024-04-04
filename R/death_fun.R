@@ -1,3 +1,18 @@
+#' Function that performs a death step
+#'
+#' @param k :int
+#' @param k_new :int
+#' @param a : vec
+#' @param sig2 :num
+#' @param x :vec
+#' @param X :matrix
+#' @param kmax :int
+#'
+#' @return list with updated a and k values
+#' @export
+#'
+#' @examples
+#' Will add soon
 death_fun = function(k,k_new,a,sig2,x, X, kmax){
   a_prop = a
   L_birth = loglike_fun(kmax = kmax, k = k, sig2 = sig2, a = a, x=x, X=X)
