@@ -1,3 +1,18 @@
+#' Runs the rjmcmc algorithm
+#'
+#' @param iter 
+#' @param k 
+#' @param sig2 
+#' @param x 
+#' @param kmax 
+#' @param alpha_p 
+#' @param beta_p 
+#'
+#' @return matrix with parameters a, k, and sig2
+#' @export
+#'
+#' @examples
+#' will add soon
 rjmcmc_nested = function(iter, k, sig2, x, kmax, alpha_p = 2, beta_p = 1){
   # Get the length of the time series x, which is maxT
   maxT = length(x)
