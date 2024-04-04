@@ -4,10 +4,11 @@
 #' @param k_prop : integer in [0,kmax], either k_int - 1 or k_int + 1, proposed k value
 #' @param kmax : integer greater than 0, max ar(k) process that can be checked
 #'
-#' @return
+#' @return probability of either birth or death
 #' @export
 #'
 #' @examples
+#' will add soon
 get_r_fun = function(k_int,k_prop,kmax){
   # returns the probability birth or death
   can_birth = as.numeric(k_int < kmax)
