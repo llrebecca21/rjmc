@@ -60,16 +60,16 @@ ex_1 = rjmcmc_nested(iter = iter,k = 3,sig2 = 1,x = x,kmax = 30)
 plot(ex_1[-c(1:100),32])
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+<img src="man/figures/README-example-1.png" width="100%" />
 
 ``` r
 # posterior probabilty
 table(ex_1[-c(1:100),32])/(iter - 100)
 #> 
 #>            2            3            4            5            6            7 
-#> 0.0140404040 0.0004040404 0.0274747475 0.0002020202 0.0005050505 0.0021212121 
+#> 0.0067676768 0.0010101010 0.0048484848 0.0001010101 0.0019191919 0.0005050505 
 #>            8            9           10           11           12           13 
-#> 0.0015151515 0.0002020202 0.5160606061 0.3832323232 0.0528282828 0.0014141414
+#> 0.0002020202 0.0011111111 0.9353535354 0.0462626263 0.0014141414 0.0005050505
 
 # anything after ar 10 were given 0, but allowed to go to 30
 #plot(rj_mat[,11], type = "l")
@@ -81,14 +81,12 @@ for(d in 1:30){
 }
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-2.png" width="100%" />
+<img src="man/figures/README-example-2.png" width="100%" />
 
 You’ll still need to render `README.Rmd` regularly, to keep `README.md`
 up-to-date. `devtools::build_readme()` is handy for this.
 
 You can also embed plots, for example:
-
-<img src="man/figures/README-pressure-1.png" width="100%" />
 
 In that case, don’t forget to commit and push the resulting figure
 files, so they display on GitHub and CRAN.

@@ -55,7 +55,7 @@ x = arima.sim(model = list("ar" = ar_c), n = maxT)
 
 Now we can call the library and run an example using the `rjmcmc_nested()` function.
 
-```{r}
+```{r example}
 library(rjmc)
 set.seed(100)
 iter = 10000
@@ -79,9 +79,5 @@ for(d in 1:30){
 You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
 
 You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
 
 In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
