@@ -7,15 +7,17 @@
 #' @param x :vec
 #' @param X :matrix
 #' @param kmax :int
+#' @param maxT : int
 #'
 #' @return list with updated a and k values
 #'
 #' @examples
 #' ## Will add soon
-death_fun = function(k,k_new,a,sig2,x, X, kmax){
+death_fun = function(k,k_new,a,sig2,x, X, kmax, maxT){
+  maxT = length(x)
   a_prop = a
-  L_birth = loglike_fun(kmax = kmax, k = k, sig2 = sig2, a = a, x=x, X=X)
-  L_death = loglike_fun(kmax = kmax, k = k_new, sig2 = sig2, a = a_prop, x=x, X=X)
+  L_birth = loglike_fun(kmax = kmax, k = k, sig2 = sig2, a = a, x=x, X=X, maxT = maxT)
+  L_death = loglike_fun(kmax = kmax, k = k_new, sig2 = sig2, a = a_prop, x=x, X=X, maxT = maxT)
   # priors:
   p_birth = stats::dnorm(a[k], mean = 0, sd = 1, log = TRUE)
   # r
