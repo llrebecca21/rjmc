@@ -35,7 +35,7 @@ We will walk through how to use this package to implement Example 1.2 from Rober
 
 First need to create a time series of length `maxT` with a known set of true AR coefficients. We will use the coefficients given in the Godsill, 2001 paper.
 
-```{r}
+```{r Create Time Series}
 # Create a time series using arima.sim
 # length of time series
 maxT = 1000
@@ -57,18 +57,18 @@ Now we can call the library and run an example using the `rjmcmc_nested()` funct
 
 ```{r example}
 library(rjmc)
+# set the seed for reproducibility
 set.seed(100)
+# Set the number of iterations
 iter = 10000
+# Run the rjmcmc nested example on the time series
 ex_1 = rjmcmc_nested(iter = iter,k = 3,sig2 = 1,x = x,kmax = 30)
+```
 
-plot(ex_1[-c(1:100),32])
-# posterior probabilty
-table(ex_1[-c(1:100),32])/(iter - 100)
+# Plots without burn-in
 
-# anything after ar 10 were given 0, but allowed to go to 30
-#plot(rj_mat[,11], type = "l")
-#plot(rj_mat[,24], type = "l")
-
+View the plots first without burn-in to determine what burn-in should be:
+```{r trace plots no burn-in}
 par(mfrow = c(6,5), mar = c(2,2,1,1))
 for(d in 1:30){
   plot(ex_1[1:3000,d], type = "l", ylim = c(-1,1))
@@ -76,8 +76,20 @@ for(d in 1:30){
 
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
+Seems the burn-in for this particular example should be around 500.
 
-You can also embed plots, for example:
+# Plots with burn-in removed
+```{r plots with burnin}
+# Example plot output with burn-in of 500
+plot(ex_1[-c(1:500),32])
+# Table of the posterior probability
+table(ex_1[-c(1:500),32])/(iter - 500)
+```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+```{r trace plots with burnin}
+par(mfrow = c(6,5), mar = c(2,2,1,1))
+for(d in 1:30){
+  plot(ex_1[500:3000,d], type = "l", ylim = c(-1,1))
+}
+
+```
