@@ -28,5 +28,5 @@ list with updated a and k values
 Function that performs a death step
 }
 \examples{
-Will add soon
+## Will add soon
 }
