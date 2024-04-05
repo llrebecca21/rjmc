@@ -4,7 +4,7 @@
 \alias{birth_fun}
 \title{Function that performs a birth step}
 \usage{
-birth_fun(k, k_new, a, sig2, x, X, kmax)
+birth_fun(k, k_new, a, sig2, x, X, kmax, maxT)
 }
 \arguments{
 \item{k}{: int}
@@ -20,6 +20,8 @@ birth_fun(k, k_new, a, sig2, x, X, kmax)
 \item{X}{: matrix}
 
 \item{kmax}{:int}
+
+\item{maxT}{:int}
 }
 \value{
 a list with updated a and k values
