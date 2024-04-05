@@ -60,18 +60,24 @@ library(rjmc)
 # set the seed for reproducibility
 set.seed(100)
 # Set the number of iterations
-iter = 10000
+iter = 3000
 # Run the rjmcmc nested example on the time series
 ex_1 = rjmcmc_nested(iter = iter,k = 3,sig2 = 1,x = x,kmax = 30)
 ```
 
 # Plots without burn-in
+```{r plots-without-burnin}
+# Example plot output with burn-in of 500
+plot(ex_1[1:iter,32])
+# Table of the posterior probability
+table(ex_1[1:iter,32])/(iter)
+```
 
 View the plots first without burn-in to determine what burn-in should be:
-```{r trace plots no burn-in}
+```{r trace-plots-no-burn-in}
 par(mfrow = c(6,5), mar = c(2,2,1,1))
 for(d in 1:30){
-  plot(ex_1[1:3000,d], type = "l", ylim = c(-1,1))
+  plot(ex_1[1:iter,d], type = "l", ylim = c(-1,1))
 }
 
 ```
@@ -79,17 +85,18 @@ for(d in 1:30){
 Seems the burn-in for this particular example should be around 500.
 
 # Plots with burn-in removed
-```{r plots with burnin}
+```{r plots-with-burnin}
+burnin = 500
 # Example plot output with burn-in of 500
-plot(ex_1[-c(1:500),32])
+plot(ex_1[-c(1:burnin),32])
 # Table of the posterior probability
-table(ex_1[-c(1:500),32])/(iter - 500)
+table(ex_1[-c(1:burnin),32])/(iter - burnin)
 ```
 
-```{r trace plots with burnin}
+```{r trace-plots-with-burnin}
 par(mfrow = c(6,5), mar = c(2,2,1,1))
 for(d in 1:30){
-  plot(ex_1[500:3000,d], type = "l", ylim = c(-1,1))
+  plot(ex_1[burnin:iter,d], type = "l", ylim = c(-1,1))
 }
 
 ```

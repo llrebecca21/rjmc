@@ -56,12 +56,31 @@ library(rjmc)
 # set the seed for reproducibility
 set.seed(100)
 # Set the number of iterations
-iter = 10000
+iter = 3000
 # Run the rjmcmc nested example on the time series
 ex_1 = rjmcmc_nested(iter = iter,k = 3,sig2 = 1,x = x,kmax = 30)
 ```
 
 # Plots without burn-in
+
+``` r
+# Example plot output with burn-in of 500
+plot(ex_1[1:iter,32])
+```
+
+<img src="man/figures/README-plots-without-burnin-1.png" width="100%" />
+
+``` r
+# Table of the posterior probability
+table(ex_1[1:iter,32])/(iter)
+#> 
+#>            2            3            4            5            6            7 
+#> 0.0576666667 0.0020000000 0.0026666667 0.0016666667 0.0023333333 0.0083333333 
+#>            8            9           10           11           12           13 
+#> 0.0076666667 0.6946666667 0.1870000000 0.0256666667 0.0053333333 0.0043333333 
+#>           14 
+#> 0.0006666667
+```
 
 View the plots first without burn-in to determine what burn-in should
 be:
@@ -69,36 +88,37 @@ be:
 ``` r
 par(mfrow = c(6,5), mar = c(2,2,1,1))
 for(d in 1:30){
-  plot(ex_1[1:3000,d], type = "l", ylim = c(-1,1))
+  plot(ex_1[1:iter,d], type = "l", ylim = c(-1,1))
 }
 ```
 
-<img src="man/figures/README-trace plots no burn-in-1.png" width="100%" />
+<img src="man/figures/README-trace-plots-no-burn-in-1.png" width="100%" />
 
 Seems the burn-in for this particular example should be around 500.
 
 # Plots with burn-in removed
 
 ``` r
+burnin = 500
 # Example plot output with burn-in of 500
-plot(ex_1[-c(1:500),32])
+plot(ex_1[-c(1:burnin),32])
 ```
 
-<img src="man/figures/README-plots with burnin-1.png" width="100%" />
+<img src="man/figures/README-plots-with-burnin-1.png" width="100%" />
 
 ``` r
 # Table of the posterior probability
-table(ex_1[-c(1:500),32])/(iter - 500)
+table(ex_1[-c(1:burnin),32])/(iter - burnin)
 #> 
-#>           10           11           12           13 
-#> 0.9658947368 0.0322105263 0.0012631579 0.0006315789
+#>      9     10     11     12     13     14 
+#> 0.7592 0.1984 0.0300 0.0064 0.0052 0.0008
 ```
 
 ``` r
 par(mfrow = c(6,5), mar = c(2,2,1,1))
 for(d in 1:30){
-  plot(ex_1[500:3000,d], type = "l", ylim = c(-1,1))
+  plot(ex_1[burnin:iter,d], type = "l", ylim = c(-1,1))
 }
 ```
 
-<img src="man/figures/README-trace plots with burnin-1.png" width="100%" />
+<img src="man/figures/README-trace-plots-with-burnin-1.png" width="100%" />
