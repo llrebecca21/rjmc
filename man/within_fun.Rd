@@ -4,7 +4,7 @@
 \alias{within_fun}
 \title{function to perform a within model move}
 \usage{
-within_fun(k, x, X, sig2)
+within_fun(k, x, X, sig2, kmax, maxT)
 }
 \arguments{
 \item{k}{: int}
@@ -14,6 +14,10 @@ within_fun(k, x, X, sig2)
 \item{X}{: matrix}
 
 \item{sig2}{: num}
+
+\item{kmax}{:int}
+
+\item{maxT}{:int}
 }
 \value{
 updated ar coefficients a
@@ -22,5 +26,5 @@ updated ar coefficients a
 function to perform a within model move
 }
 \examples{
-will add soon
+## will add soon
 }
