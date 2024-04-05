@@ -20,5 +20,10 @@ matrix of lagged x time series
 Function creates lagged x matrix
 }
 \examples{
-Example to come
+x = c(4.8407828, 3.1495432, 1.0391882, -0.5670270, -1.2837761, -0.4528256,
+ -1.1621543, -1.8725529, -2.7431505, -3.6796526)        
+maxT = 10        
+kmax = 30         
+        
+        
 }
