@@ -18,5 +18,5 @@ an integer that is the proposal k
 Determines a proposal for new k
 }
 \examples{
-will add soon
+## will add soon
 }
