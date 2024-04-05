@@ -64,26 +64,26 @@ ex_1 = rjmcmc_nested(iter = iter,k = 3,sig2 = 1,x = x,kmax = 30)
 # Plots without burn-in
 
 ``` r
-# Example plot output with burn-in of 500
+# Example plot output without burn-in
 plot(ex_1[1:iter,32])
 ```
 
 <img src="man/figures/README-plots-without-burnin-1.png" width="100%" />
 
 ``` r
-# Table of the posterior probability
+# Table of the posterior probability without burnin
 table(ex_1[1:iter,32])/(iter)
 #> 
 #>            2            3            4            5            6            7 
-#> 0.0576666667 0.0020000000 0.0026666667 0.0016666667 0.0023333333 0.0083333333 
+#> 0.0576666667 0.0020000000 0.0026666667 0.0016666667 0.0023333333 0.0166666667 
 #>            8            9           10           11           12           13 
-#> 0.0076666667 0.6946666667 0.1870000000 0.0256666667 0.0053333333 0.0043333333 
+#> 0.0106666667 0.0430000000 0.8340000000 0.0240000000 0.0016666667 0.0033333333 
 #>           14 
-#> 0.0006666667
+#> 0.0003333333
 ```
 
-View the plots first without burn-in to determine what burn-in should
-be:
+View all of the trace plots first without burn-in to determine what
+burn-in should be:
 
 ``` r
 par(mfrow = c(6,5), mar = c(2,2,1,1))
@@ -111,7 +111,7 @@ plot(ex_1[-c(1:burnin),32])
 table(ex_1[-c(1:burnin),32])/(iter - burnin)
 #> 
 #>      9     10     11     12     13     14 
-#> 0.7592 0.1984 0.0300 0.0064 0.0052 0.0008
+#> 0.0428 0.9272 0.0236 0.0020 0.0040 0.0004
 ```
 
 ``` r
