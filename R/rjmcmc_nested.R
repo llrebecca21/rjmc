@@ -41,7 +41,7 @@ rjmcmc_nested = function(iter, k, sig2, x, kmax, alpha_p = 2, beta_p = 1){
       k = output$k
     }
     # perform within model move
-    a[1:k] = within_fun(k = k, x = x, X = X, sig2 = sig2, kmax = kmax, maxT = maxT)
+    a[1:k] = within_fun(k = k, x = x, X = X, sig2 = sig2, kmax = kmax)
     # update ith row of rj_mat
     rj_mat[i,] = c(a,sig2,k)
   }

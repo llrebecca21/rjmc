@@ -6,7 +6,6 @@
 #' @param a : vec
 #' @param x :vec
 #' @param X :matrix
-#' @param maxT : int
 #'
 #' @return the log likelihood
 #'

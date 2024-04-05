@@ -4,7 +4,7 @@
 \alias{loglike_fun}
 \title{Calculates the log-likelihood}
 \usage{
-loglike_fun(kmax, k, sig2, a, x, X, maxT)
+loglike_fun(kmax, k, sig2, a, x, X)
 }
 \arguments{
 \item{kmax}{:int}
@@ -18,8 +18,6 @@ loglike_fun(kmax, k, sig2, a, x, X, maxT)
 \item{x}{:vec}
 
 \item{X}{:matrix}
-
-\item{maxT}{: int}
 }
 \value{
 the log likelihood
