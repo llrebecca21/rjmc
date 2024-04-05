@@ -4,10 +4,9 @@
 #' @param kmax :int
 #'
 #' @return an integer that is the proposal k
-#' @export
 #'
 #' @examples
-#' will add soon
+#' ## will add soon
 k_fun = function(k,kmax){
   # Determine if birth can occur
   can_birth = as.numeric(k < kmax)
