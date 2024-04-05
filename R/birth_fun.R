@@ -23,7 +23,8 @@
 #'  -0.4510330, -0.1845782, -0.9725866, 0.1359826, 1.761263, 2.402950,
 #'   1.037612, 2.2581412,  0.7919269, -0.4510330, -0.1845782),
 #'    nrow = 2, ncol = 8,byrow = TRUE)
-birth_fun = function(k,k_new,a,sig2,x, X, kmax, maxT){
+birth_fun = function(k,k_new,a,sig2,x, X, kmax){
+  maxT = length(x)
   nu = stats::rnorm(1, mean = 0, sd = 0.3)
   a_prop = a
   a_prop[k_new] = nu

@@ -13,7 +13,7 @@
 #'
 #' @examples
 #' ## Will add soon
-death_fun = function(k,k_new,a,sig2,x, X, kmax, maxT){
+death_fun = function(k,k_new,a,sig2,x, X, kmax){
   maxT = length(x)
   a_prop = a
   L_birth = loglike_fun(kmax = kmax, k = k, sig2 = sig2, a = a, x=x, X=X, maxT = maxT)
