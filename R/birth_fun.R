@@ -7,7 +7,6 @@
 #' @param x :vector
 #' @param X : matrix
 #' @param kmax :int
-#' @param maxT :int
 #'
 #' @return a list with updated a and k values
 #'
