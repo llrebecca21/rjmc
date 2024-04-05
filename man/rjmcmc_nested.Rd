@@ -7,19 +7,19 @@
 rjmcmc_nested(iter, k, sig2, x, kmax, alpha_p = 2, beta_p = 1)
 }
 \arguments{
-\item{iter}{}
+\item{iter}{:int}
 
-\item{k}{}
+\item{k}{:int}
 
-\item{sig2}{}
+\item{sig2}{:num}
 
-\item{x}{}
+\item{x}{: vec}
 
-\item{kmax}{}
+\item{kmax}{: int}
 
-\item{alpha_p}{}
+\item{alpha_p}{:int}
 
-\item{beta_p}{}
+\item{beta_p}{:int}
 }
 \value{
 matrix with parameters a, k, and sig2
@@ -28,5 +28,5 @@ matrix with parameters a, k, and sig2
 Runs the rjmcmc algorithm
 }
 \examples{
-will add soon
+## will add soon
 }
