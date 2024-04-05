@@ -4,7 +4,7 @@
 \alias{death_fun}
 \title{Function that performs a death step}
 \usage{
-death_fun(k, k_new, a, sig2, x, X, kmax)
+death_fun(k, k_new, a, sig2, x, X, kmax, maxT)
 }
 \arguments{
 \item{k}{:int}
@@ -20,6 +20,8 @@ death_fun(k, k_new, a, sig2, x, X, kmax)
 \item{X}{:matrix}
 
 \item{kmax}{:int}
+
+\item{maxT}{: int}
 }
 \value{
 list with updated a and k values
