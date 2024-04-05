@@ -7,6 +7,7 @@
 #' @param x :vector
 #' @param X : matrix
 #' @param kmax :int
+#' @param maxT :int
 #'
 #' @return a list with updated a and k values
 #'
@@ -22,12 +23,12 @@
 #'  -0.4510330, -0.1845782, -0.9725866, 0.1359826, 1.761263, 2.402950,
 #'   1.037612, 2.2581412,  0.7919269, -0.4510330, -0.1845782),
 #'    nrow = 2, ncol = 8,byrow = TRUE)
-birth_fun = function(k,k_new,a,sig2,x, X, kmax){
+birth_fun = function(k,k_new,a,sig2,x, X, kmax, maxT){
   nu = stats::rnorm(1, mean = 0, sd = 0.3)
   a_prop = a
   a_prop[k_new] = nu
-  L_birth = loglike_fun(kmax = kmax, k = k_new, sig2 = sig2, a = a_prop, x=x, X=X)
-  L_death = loglike_fun(kmax = kmax, k = k, sig2 = sig2, a = a, x=x, X=X)
+  L_birth = loglike_fun(kmax = kmax, k = k_new, sig2 = sig2, a = a_prop, x=x, X=X, maxT = maxT)
+  L_death = loglike_fun(kmax = kmax, k = k, sig2 = sig2, a = a, x=x, X=X, maxT = maxT)
   # priors:
   p_birth = dnorm(a_prop[k_new], mean = 0, sd = 1, log = TRUE)
   # r
