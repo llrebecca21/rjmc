@@ -31,17 +31,13 @@ devtools::install_github("llrebecca21/rjmc")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+We will walk through how to use this package to implement Example 1.2 from Robert and Casella's "Efficient Construction of reversible jump Markov chain Monte Carlo proposal distributions" (2003) and Example 2.7 in Godsill's "On the Relationship Between Markov Chain Monte Carlo Methods for Model Uncertainty" (2001).
+
+First need to create a time series of length `maxT`.
 
 ```{r example}
 library(rjmc)
-## basic example code
-```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
-
-```{r cars}
-summary(cars)
 ```
 
 You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
