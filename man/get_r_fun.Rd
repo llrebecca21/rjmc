@@ -7,9 +7,9 @@
 get_r_fun(k_int, k_prop, kmax)
 }
 \arguments{
-\item{k_int}{: integer in \link{0,kmax}, current k value}
+\item{k_int}{: integer in 0 to kmax, current k value}
 
-\item{k_prop}{: integer in \link{0,kmax}, either k_int - 1 or k_int + 1, proposed k value}
+\item{k_prop}{: integer in 0 to kmax, either k_int - 1 or k_int + 1, proposed k value}
 
 \item{kmax}{: integer greater than 0, max ar(k) process that can be checked}
 }
@@ -20,5 +20,5 @@ probability of either birth or death
 Function that calculates the r_(i,j) probability in the acceptance ratio
 }
 \examples{
-will add soon
+## will add soon
 }
