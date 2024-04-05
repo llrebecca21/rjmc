@@ -31,12 +31,12 @@ rjmcmc_nested = function(iter, k, sig2, x, kmax, alpha_p = 2, beta_p = 1){
     k_new = k_fun(k=k,kmax=kmax)
     if(k_new > k){# if k_new > k perform birth move
       # run birth move
-      output = birth_fun(k = k, k_new = k_new, a = a, sig2 = sig2, x = x, X = X, kmax = kmax, maxT = maxT)
+      output = birth_fun(k = k, k_new = k_new, a = a, sig2 = sig2, x = x, X = X, kmax = kmax)
       a = output$a
       k = output$k
     }else{ # if k_new < k perform death move
       # run death move
-      output = death_fun(k = k, k_new = k_new, a = a, sig2 = sig2, x = x, X = X, kmax = kmax, maxT = maxT)
+      output = death_fun(k = k, k_new = k_new, a = a, sig2 = sig2, x = x, X = X, kmax = kmax)
       a = output$a
       k = output$k
     }
