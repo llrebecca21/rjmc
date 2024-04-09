@@ -7,7 +7,11 @@
 #' @param kmax : int
 #' @param alpha_p :int
 #' @param beta_p :int
-#'
+#' 
+#' @references 
+#' \insertCite{robert_monte_2004;textual}{rjmc}
+#' 
+#' 
 #' @return matrix with parameters a, k, and sig2
 #' @export
 #'
