@@ -30,3 +30,6 @@ Runs the rjmcmc algorithm
 \examples{
 ## will add soon
 }
+\references{
+\insertCite{robert_monte_2004;textual}{rjmc}
+}
