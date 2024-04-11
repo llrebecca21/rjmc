@@ -9,8 +9,11 @@
 #' @param beta_p :int
 #' 
 #' @references 
-#' \insertCite{robert_monte_2004;textual}{rjmc}
+#' \insertRef{brooks_efficient_2003}{rjmc}
 #' 
+#' \insertRef{green_reversible_1995}{rjmc}
+#' 
+#' \insertRef{robert_monte_2004}{rjmc}
 #' 
 #' @return matrix with parameters a, k, and sig2
 #' @export
@@ -49,6 +52,23 @@ rjmcmc_nested = function(iter, k, sig2, x, kmax, alpha_p = 2, beta_p = 1){
     # update ith row of rj_mat
     rj_mat[i,] = c(a,sig2,k)
   }
+  
+  # Create Labels for the data frame output of the function
+  label_ex = rep(NA,kmax+2)
+  for(i in 1:(kmax+2)){
+    if(i %in% 1:kmax){
+      label_ex[i] = paste("AR(",i,")", sep = "")
+    }else if(i == (kmax + 1)){
+      label_ex[i] = paste("sig2", sep = "")
+    }else{
+      label_ex[i] = paste("k", sep = "")
+    }
+  }
+  
+  # Save the rj_mat as a data frame for ease of plotting
+  rj_mat = as.data.frame(rj_mat)
+  # set column names to the new labels above
+  names(rj_mat) = label_ex
   return(rj_mat)
 }
 
