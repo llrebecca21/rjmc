@@ -57,7 +57,7 @@ rjmcmc_nested = function(iter, k, sig2, x, kmax, alpha_p = 2, beta_p = 1){
   label_ex = rep(NA,kmax+2)
   for(i in 1:(kmax+2)){
     if(i %in% 1:kmax){
-      label_ex[i] = paste("AR(",i,")", sep = "")
+      label_ex[i] = paste("\U03D5(",i,")", sep = "")
     }else if(i == (kmax + 1)){
       label_ex[i] = paste("sig2", sep = "")
     }else{
@@ -66,9 +66,9 @@ rjmcmc_nested = function(iter, k, sig2, x, kmax, alpha_p = 2, beta_p = 1){
   }
   
   # Save the rj_mat as a data frame for ease of plotting
-  rj_mat = as.data.frame(rj_mat)
+  # rj_mat = as.data.frame(rj_mat)
   # set column names to the new labels above
-  names(rj_mat) = label_ex
+  colnames(rj_mat) = label_ex
   return(rj_mat)
 }
 
