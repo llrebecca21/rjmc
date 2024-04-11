@@ -12,6 +12,9 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+knitr::opts_chunk$set(fig.align = "center", 
+               out.width = "90%",
+               fig.width = 6, fig.height = 5.5)
 ```
 
 ## Running the rjmcmc_nested() Function
@@ -65,12 +68,19 @@ kmax = 20
 sig2 = 1
 # Set starting value of k
 k = 10
+chains = 5
+ex_1 = vector(mode = "list", length = chains)
 ```
 
 Now, we can call the function and save it to some variable `ex_1`.
 
 ```{r}
-ex_1 = rjmcmc_nested(iter = iter,k = k,sig2 = sig2,x = x,kmax = kmax,alpha_p = 2, beta_p = 1)
+# Create a list of data frames to store our chains
+for(i in 1:chains){
+  ex_1[[i]]=rjmcmc_nested(iter = iter,k = k,sig2 = 1,x = x,kmax = kmax)
+}
+# extract the labels names
+lab = colnames(ex_1[[1]])
 ```
 
 The output of `rjmcmc_nested` is given as a data frame with column names corresponding to the AR(k) coefficients with the last two columns containing `sig2` and `k` updates. Not show here, due to the size of the data frame for this example. To see the output run the following line:
@@ -80,16 +90,191 @@ ex_1
 ```
 
 
-### Diagnostic Plots: Initial k same as true k
+## Diagnostic Plots: Initial k same as true k
+
+### Plots \emph{without} burn-in
+
+Trace Plots of $\sigma^2_{\epsilon}$ and $k$. We expected $\sigma^2_{\epsilon}$ not to change, as it is not being updated currently. Looking at the trace plot of $k$ we get a good idea of how much jumping occurred during the iterations.
+
+```{r}
+# Trace plots of sig2 and k
+bayesplot::mcmc_trace(x = ex_1, pars = lab[21:22])
+```
+
+We can also view the table of the posterior probability without burn-in:
+```{r}
+table(ex_1[[1]][1:iter,22])/(iter)
+table(ex_1[[2]][1:iter,22])/(iter)
+table(ex_1[[3]][1:iter,22])/(iter)
+table(ex_1[[4]][1:iter,22])/(iter)
+table(ex_1[[5]][1:iter,22])/(iter)
+```
+
+For this example, we see that an AR(10) was visited the most often across each chain. We will see this in the trace plots of all of the AR(k) coefficients:
+
+Now we plot the trace plots of all AR(k) coefficients without burn-in from 1-`kmax`
+```{r}
+bayesplot::mcmc_trace(x = ex_1, pars = lab[-c(21:22)]) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  ylim(-1,1)
+```
+
+Due to the many trace plots, it is somewhat difficult to determine where our burn-in should be. So, let us plot the trace plots again but restricting to only the $\phi(1)$ through $\phi(12)$ coefficients.
+
+```{r}
+bayesplot::mcmc_trace(x = ex_1, pars = lab[1:12]) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r message=FALSE, warning=FALSE}
+library(mcmcse)
+# Autocorrelation with no thinning
+mcmc_acf(ex_1, pars = lab[-c(11:20)],lags = 30)
+# Autocorrelation with thinning of 10
+mcmc_acf(lapply(ex_1, FUN = function(x) x[c(T, rep(F, 9)), ]), pars = lab[-c(11:20)])
+```
 
 
 
 
 
 
+### Plots \emph{with} burn-in
+
+Set the variable `burnin` to be $50$. In `bayesplot` when you include `n_warmup` as an input and set it equal to `burnin` it darkens the area that is considered excluded.
+
+```{r plots-with-burnin, warning=FALSE}
+burnin = 50
+# Trace plots of sig2 and k
+bayesplot::mcmc_trace(x = ex_1,pars = lab[21:22]) + xlim(burnin+1,3000)
+```
+
+Table of the posterior probability of `k`
+```{r}
+table(ex_1[[1]][-c(1:burnin),22])/(iter - burnin)
+table(ex_1[[2]][-c(1:burnin),22])/(iter - burnin)
+table(ex_1[[3]][-c(1:burnin),22])/(iter - burnin)
+table(ex_1[[4]][-c(1:burnin),22])/(iter - burnin)
+table(ex_1[[5]][-c(1:burnin),22])/(iter - burnin)
+```
+
+Now with our burn-in removed we have our posterior probabilities of $k$ across each chain. So, this algorithm was able to correctly choose the correct `k` when we give it the true `k` value to begin with, which is not a huge surprise.
+
+Now we can view our trace plots again:
+
+Plot the trace plots of all the $\phi(k)$ coefficients
+```{r warning=FALSE}
+bayesplot::mcmc_trace(x = ex_1,pars = lab[-c(21,22)]) + xlim(burnin+1,iter)+
+  ylim(-1,1)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+Trace plots of only AR(1) through AR(10)
+```{r warning=FALSE}
+bayesplot::mcmc_trace(x = ex_1, pars = lab[1:12]) +xlim(burnin+1,iter)+
+  ylim(-1,1)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
+
+# Example: initial k less than true k
+
+Now we will run the example again but this time set the initial `k` value to less than the true `k` value. For this example, we chose to set `k = 5`.
+
+```{r}
+# reset the seed
+set.seed(100)
+# Set the number of iterations
+iter = 3000
+# Set the highest value k can possible take
+kmax = 20
+# Set starting value of sig2
+sig2 = 1
+# Set starting value of k
+k = 1
+chains = 10
+ex_2 = vector(mode = "list", length = chains)
+```
+
+Now, we can call the function and save it to some variable `ex_2`.
+
+```{r}
+# Create a list of data frames to store our chains
+for(i in 1:chains){
+  ex_2[[i]]=rjmcmc_nested(iter = iter,k = k,sig2 = 1,x = x,kmax = kmax)
+}
+# extract the labels names
+lab = colnames(ex_2[[1]])
+
+```
+
+# Diagnostic Plots : Initial k less than true k
+
+```{r}
+# Trace plots of sig2 and k
+bayesplot::mcmc_trace(x = ex_2, pars = lab[21:22])
+```
+
+We can also view the table of the posterior probability without burn-in:
+```{r}
+table(ex_2[[1]][1:iter,22])/(iter)
+table(ex_2[[2]][1:iter,22])/(iter)
+table(ex_2[[3]][1:iter,22])/(iter)
+table(ex_2[[4]][1:iter,22])/(iter)
+table(ex_2[[5]][1:iter,22])/(iter)
+```
+
+For this example, we see that an AR(10) was visited the most often across each chain. We will see this in the trace plots of all of the AR(k) coefficients:
+
+Now we plot the trace plots of all AR(k) coefficients without burn-in from 1-`kmax`
+```{r}
+bayesplot::mcmc_trace(x = ex_2, pars = lab[-c(21:22)]) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  ylim(-1,1)
+```
 
 
 
 
+# Initial k
+
+```{r}
+
+# reset the seed
+set.seed(100)
+# Set the number of iterations
+iter = 3000
+# Set the highest value k can possible take
+kmax = 20
+# Set starting value of sig2
+sig2 = 1
+# Set possible starting values of k
+k_seq = 1:kmax
+chains = 5
+ex_k = vector(mode = "list", length = chains)
+# stores the time when chain hits true k
+first_tk = matrix(NA,nrow = kmax, ncol = chains)
+
+# Create a list of data frames to store our chains
+for(k in k_seq){
+  for(i in 1:chains){
+    ex_k[[i]]=rjmcmc_nested(iter = iter,k = k,sig2 = 1,x = x,kmax = kmax)
+  }
+  first_tk[k,] = sapply(ex_k, FUN = function(x){which(x[,kmax+2] == 10)[1]})
+}
+
+```
+
+
+```{r}
+plot(x = rep(k_seq,chains), y = c(first_tk),
+     xaxt = "n",
+     ylab = "Iterations",
+     xlab = "Initial k",
+     main = "How Many Iterations Until k = 10 Is First Accepted")
+axis(1, at = 1:20)
+
+
+```
 
 
