@@ -31,5 +31,9 @@ Runs the rjmcmc algorithm
 ## will add soon
 }
 \references{
-\insertCite{robert_monte_2004;textual}{rjmc}
+\insertRef{brooks_efficient_2003}{rjmc}
+
+\insertRef{green_reversible_1995}{rjmc}
+
+\insertRef{robert_monte_2004}{rjmc}
 }
