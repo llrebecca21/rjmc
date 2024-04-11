@@ -11,7 +11,7 @@ k_fun = function(k,kmax){
   # Determine if birth can occur
   can_birth = as.numeric(k < kmax)
   # Determine if death can occur
-  can_death = as.numeric(k > 0)
+  can_death = as.numeric(k > 1)
   # probability of birth
   prob_birth = can_birth/(can_birth + can_death)
   # probability of death
