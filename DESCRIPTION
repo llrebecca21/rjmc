@@ -15,3 +15,7 @@ Imports:
     mvtnorm,
     stats,
     Rdpack
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
