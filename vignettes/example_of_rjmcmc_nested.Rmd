@@ -1,0 +1,95 @@
+---
+title: "Example of rjmcmc_nested"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Example of rjmcmc_nested}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Running the rjmcmc_nested() Function
+
+This vignette will walk through how to use the `rjmcmc_nested` function to run the RJMCMC sampler first created by Green, 1995 on the Example 1.2 from the Brooks,et.al., 2003 paper. This Example implements the RJMCMC sampler for nested AR(k) time series. We will also explore how the initial value of `k` impacts the convergence of the algorithm.
+
+First, follow the installation steps in the README documentation in order to install the `rjmc` package from GitHub.
+
+Next, we will need the following packages called:
+
+```{r setup}
+library(rjmc)
+library(bayesplot) # for plotting trace plots
+library(ggplot2) # for altering plots produced by bayesplot
+```
+
+## Example: Initial k same as true k
+
+First need to create a time series of length `maxT` with a known set of true AR coefficients. We will use the coefficients given in the Godsill, 2001 paper.
+
+```{r Create Time Series}
+# set the seed for reproducibility
+set.seed(100)
+# Create a time series using arima.sim
+# length of time series
+maxT = 1000
+# AR coefficients
+ar_c = c(0.9402,
+         -0.43,
+         0.4167,
+         -0.4969,
+         0.4771,
+         -0.5010,
+         0.0509,
+         -0.2357,
+         0.4024,
+         -0.1549)
+x = arima.sim(model = list("ar" = ar_c), n = maxT)
+```
+
+True `k` is then equal to `10` for the examples in this vignette.
+
+Next, we set the number of iterations,`iter`, and set the max value of k can take during the iterations,`kmax`. We also initialize the initial value of the $\sigma^2_{\epsilon}$ parameter,`sig2` and our starting value for the order of the time series `k`. We keep the inputs for `alpha_p` and `beta_p` as the defaults for the function so that `sig2` does not update and stays as $1$ throughout these examples and we can focus on how different initial values of `k` change our results. \emph{Fix wording here once package can handle updates of sig2}
+
+```{r initializing}
+# Set the number of iterations
+iter = 3000
+# Set the highest value k can possible take
+kmax = 20
+# Set starting value of sig2
+sig2 = 1
+# Set starting value of k
+k = 10
+```
+
+Now, we can call the function and save it to some variable `ex_1`.
+
+```{r}
+ex_1 = rjmcmc_nested(iter = iter,k = k,sig2 = sig2,x = x,kmax = kmax,alpha_p = 2, beta_p = 1)
+```
+
+The output of `rjmcmc_nested` is given as a data frame with column names corresponding to the AR(k) coefficients with the last two columns containing `sig2` and `k` updates. Not show here, due to the size of the data frame for this example. To see the output run the following line:
+
+```{r echo=TRUE, results = 'hide'}
+ex_1
+```
+
+
+### Diagnostic Plots: Initial k same as true k
+
+
+
+
+
+
+
+
+
+
+
+
