@@ -14,7 +14,9 @@ Imports:
     bayesplot,
     mvtnorm,
     stats,
-    Rdpack
+    Rdpack,
+    latex2exp,
+    tip
 Suggests: 
     knitr,
     rmarkdown
