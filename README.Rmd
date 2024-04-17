@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of rjmc is to ...
+The goal of rjmc is 
 
 ## Installation
 
@@ -36,6 +36,8 @@ We will walk through how to use this package to implement Example 1.2 from Rober
 First need to create a time series of length `maxT` with a known set of true AR coefficients. We will use the coefficients given in the Godsill, 2001 paper.
 
 ```{r Create Time Series}
+# set the seed for reproducibility
+set.seed(100)
 # Create a time series using arima.sim
 # length of time series
 maxT = 1000
@@ -53,50 +55,102 @@ ar_c = c(0.9402,
 x = arima.sim(model = list("ar" = ar_c), n = maxT)
 ```
 
+True `k` is then equal to `10`. In the vignette, we will show a few examples with different starting values of `k` to see how well this rjmcmc sampler can perform.
+
 Now we can call the library and run an example using the `rjmcmc_nested()` function.
 
 ```{r example}
 library(rjmc)
-# set the seed for reproducibility
-set.seed(100)
+library(bayesplot)
+library(ggplot2)
 # Set the number of iterations
 iter = 3000
+# Set the highest value k can possible take
+kmax = 20
+# Set starting value of k
+k = 10
 # Run the rjmcmc nested example on the time series
-ex_1 = rjmcmc_nested(iter = iter,k = 3,sig2 = 1,x = x,kmax = 30)
-```
-
-# Plots without burn-in
-```{r plots-without-burnin}
-# Example plot output without burn-in
-plot(ex_1[1:iter,32])
-# Table of the posterior probability without burnin
-table(ex_1[1:iter,32])/(iter)
-```
-
-View all of the trace plots first without burn-in to determine what burn-in should be:
-```{r trace-plots-no-burn-in}
-par(mfrow = c(6,5), mar = c(2,2,1,1))
-for(d in 1:30){
-  plot(ex_1[1:iter,d], type = "l", ylim = c(-1,1))
+# Choose starting k = 10
+# Create a list of data frames to store our chains
+chains = 5
+ex_1 = vector(mode = "list", length = chains)
+for(i in 1:chains){
+  ex_1[[i]]=rjmcmc_nested(iter = iter,k = k,sig2 = 1,x = x,kmax = kmax)
 }
 
+# extract the labels names
+lab = colnames(ex_1[[1]])
 ```
 
-Seems the burn-in for this particular example should be around 500.
+
+```{r}
+# Plot the trace plots of all the AR(k) parameters
+bayesplot::mcmc_trace(x = ex_1, pars = lab[-c(21:22)]) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+Due to the many trace plots, it is difficult to determine where our burn-in should be. So, let us plot the trace plots again but restricting to only the AR(1) through AR(10) parameters.
+```{r}
+bayesplot::mcmc_trace(x = ex_1, pars = lab[1:12]) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+Seems the burn-in for this particular example should be around 200. Now we will plot the trace plots again with the burn-in and standardize the y-axis limits across all AR(k) plots.
 
 # Plots with burn-in removed
-```{r plots-with-burnin}
-burnin = 500
-# Example plot output with burn-in of 500
-plot(ex_1[-c(1:burnin),32])
+```{r plots-with-burnin, message=FALSE, warning=FALSE}
+burnin = 50
+
+# Trace plots of sig2 and k
+bayesplot::mcmc_trace(x = ex_1, pars = lab[21:22]) + xlim(burnin+1,3000)
+
+# Plot the trace plots of all the AR(k) parameters
+bayesplot::mcmc_trace(x = ex_1, pars = lab[-c(21,22)]) + xlim(burnin+1,iter) +
+  ylim(-1,1)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 # Table of the posterior probability
-table(ex_1[-c(1:burnin),32])/(iter - burnin)
+# table(ex_1[-c(1:burnin),22])/(iter - burnin)
+# Trace plots of only AR(1) through AR(10)
+bayesplot::mcmc_trace(x = ex_1, pars = lab[1:12]) + xlim(burnin+1,iter)+
+  ylim(-1,1)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
-```{r trace-plots-with-burnin}
-par(mfrow = c(6,5), mar = c(2,2,1,1))
-for(d in 1:30){
-  plot(ex_1[burnin:iter,d], type = "l", ylim = c(-1,1))
+Looking at just the AR(1) through AR(10) trace plots (in base plot) we can overlay them with a horizontal line of the true AR coefficients. 
+
+# Plots with burn-in removed
+
+```{r}
+par(mfrow = c(2,5), mar = c(2,2,1,1))
+for(d in 1:10){
+  plot(ex_1[[1]][burnin:iter,d], type = "l", ylim = c(-1,1), col = "lightblue")
+  #plot true ar coefficient value
+  abline(h=ar_c[d], col = "black")
+  #plot colmeans ar coefficient value
+  #abline(h=mean(ex_1[burnin:iter,d]), col = "blue")
 }
+```
+
+```{r}
+# Look at the values of the red and blue lines and store into a small matrix:
+# true vs.colmeans
+# create padded version of ar_c
+true_ar = append(ar_c, rep(0,kmax-length(ar_c)))
+comp_ar = matrix(NA, nrow = kmax, ncol = 4)
+# fill first column with true_ar values
+comp_ar[,1] = true_ar
+for(i in 1:20){
+  comp_ar[i,2] = mean(ex_1[[1]][burnin:iter,i])
+  comp_ar[i,3] = sd(ex_1[[1]][burnin:iter,i])
+  # The third column of the matrix contains the absolute value difference between the first two columns
+  comp_ar[i,4] = (comp_ar[i,2] - comp_ar[i,1])/comp_ar[i,3]
+}
+comp_ar
+plot(comp_ar[,4], ylab = "Standardized Residual",
+     xlab = "k",
+     xaxt = "n",
+     las = 1,
+     main = "Standardized Bayes Estimator Residual of\n the AR Coefficients")
+abline(h = 0, col = "red")
+axis(1, at = 1:20)
+
 
 ```
