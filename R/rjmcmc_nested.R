@@ -47,8 +47,14 @@ rjmcmc_nested = function(iter, k, sig2, x, kmax, alpha_p = 2, beta_p = 1){
       a = output$a
       k = output$k
     }
+    # update sig2 with a Gibbs step
+    sig2 = 1/rgamma(n = 1, shape = 0.5* (maxT - kmax) + alpha_p, rate = beta_p + 0.5 * crossprod(x[(kmax+1):maxT] - X[,1:k,drop = FALSE]%*%a[1:k]))
+    
     # perform within model move
     a[1:k] = within_fun(k = k, x = x, X = X, sig2 = sig2, kmax = kmax)
+    # Update sig2 again
+    sig2 = 1/rgamma(n = 1, shape = 0.5* (maxT - kmax) + alpha_p, rate = beta_p + 0.5 * crossprod(x[(kmax+1):maxT] - X[,1:k,drop = FALSE]%*%a[1:k]))
+    
     # update ith row of rj_mat
     rj_mat[i,] = c(a,sig2,k)
   }
