@@ -29,6 +29,10 @@ Next, we will need the following packages called:
 library(rjmc)
 library(bayesplot) # for plotting trace plots
 library(ggplot2) # for altering plots produced by bayesplot
+library(latex2exp) # for including latex in plot titles
+library(knitr) # for creating nice looking tables
+library(tip) # for plotting posterior probabilities in ggplot
+library(tidyr) # for data wrangling 
 ```
 
 ## Example: Initial k same as true k
@@ -57,7 +61,7 @@ x = arima.sim(model = list("ar" = ar_c), n = maxT)
 
 True `k` is then equal to `10` for the examples in this vignette.
 
-Next, we set the number of iterations,`iter`, and set the max value of k can take during the iterations,`kmax`. We also initialize the initial value of the $\sigma^2_{\epsilon}$ parameter,`sig2` and our starting value for the order of the time series `k`. We keep the inputs for `alpha_p` and `beta_p` as the defaults for the function so that `sig2` does not update and stays as $1$ throughout these examples and we can focus on how different initial values of `k` change our results. \emph{Fix wording here once package can handle updates of sig2}
+Next, we set the number of iterations,`iter`, and set the max value that `k` can take during the iterations,`kmax`. We also initialize the initial value of the $\sigma^2_{\epsilon}$ parameter,`sig2` and our starting value for the order of the time series `k`. We also set the number of chains for our simulations, in each of the following examples we will run $10$ chains. Note: the number of iterations will be different for one of the examples due to the time it takes for the trace plots to settle down.
 
 ```{r initializing}
 # Set the number of iterations
@@ -68,7 +72,9 @@ kmax = 20
 sig2 = 1
 # Set starting value of k
 k = 10
-chains = 5
+# Set the number of chains for simulations
+chains = 10
+# 
 ex_1 = vector(mode = "list", length = chains)
 ```
 
@@ -83,109 +89,255 @@ for(i in 1:chains){
 lab = colnames(ex_1[[1]])
 ```
 
-The output of `rjmcmc_nested` is given as a data frame with column names corresponding to the AR(k) coefficients with the last two columns containing `sig2` and `k` updates. Not show here, due to the size of the data frame for this example. To see the output run the following line:
-
-```{r echo=TRUE, results = 'hide'}
-ex_1
-```
-
+The output of `rjmcmc_nested` is given as a data frame with column names corresponding to the AR(k) coefficients with the last two columns containing `sig2` and `k` updates. 
 
 ## Diagnostic Plots: Initial k same as true k
 
 ### Plots \emph{without} burn-in
 
-Trace Plots of $\sigma^2_{\epsilon}$ and $k$. We expected $\sigma^2_{\epsilon}$ not to change, as it is not being updated currently. Looking at the trace plot of $k$ we get a good idea of how much jumping occurred during the iterations.
+The following are the trace plots of $\sigma^2_{\epsilon}$ and $k$ without taking burn-in into account. The trace plot of $\sigma^2_{\epsilon}$ is able to settle down almost immediately during the iterations. Looking at the trace plot of $k$ we get a good idea of how much jumping occurred during the iterations.
 
 ```{r}
+# Create a theme used for altering the labels on the plots
+thar = theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+             plot.subtitle = element_text(hjust = 0.5, size = 10, face = "bold"),
+             axis.title.x = element_text(size=10, face="bold", colour = "black"),    
+             axis.title.y = element_text(size=10, face="bold", colour = "black"))
+
 # Trace plots of sig2 and k
-bayesplot::mcmc_trace(x = ex_1, pars = lab[21:22])
+bayesplot::mcmc_trace(x = ex_1, pars = lab[21:22]) +
+  ggtitle(TeX("Trace Plots for $\\sigma^2_{\\epsilon}$ and $k$"),
+          subtitle = TeX("$k_{initial} = k_{true}$ & burn-in not removed"))+
+  thar
 ```
 
 We can also view the table of the posterior probability without burn-in:
-```{r}
-table(ex_1[[1]][1:iter,22])/(iter)
-table(ex_1[[2]][1:iter,22])/(iter)
-table(ex_1[[3]][1:iter,22])/(iter)
-table(ex_1[[4]][1:iter,22])/(iter)
-table(ex_1[[5]][1:iter,22])/(iter)
+
+```{r echo=FALSE}
+# t1 = as.data.frame(table(ex_1[[1]][1:iter,22])/(iter))
+# t1$chain = 1
+# t2 = as.data.frame(table(ex_1[[2]][1:iter,22])/(iter))
+# t2$chain = 2
+# t3 = as.data.frame(table(ex_1[[3]][1:iter,22])/(iter))
+# t3$chain = 3
+# t4 = as.data.frame(table(ex_1[[4]][1:iter,22])/(iter))
+# t4$chain = 4
+# t5 = as.data.frame(table(ex_1[[5]][1:iter,22])/(iter))
+# t5$chain = 5
+# t6 = as.data.frame(table(ex_1[[6]][1:iter,22])/(iter))
+# t6$chain = 6
+# t7 = as.data.frame(table(ex_1[[7]][1:iter,22])/(iter))
+# t7$chain = 7
+# t8 = as.data.frame(table(ex_1[[8]][1:iter,22])/(iter))
+# t8$chain = 8
+# t9 = as.data.frame(table(ex_1[[9]][1:iter,22])/(iter))
+# t9$chain = 9
+# t10 = as.data.frame(table(ex_1[[10]][1:iter,22])/(iter))
+# t10$chain = 10
+# a = merge(t1,t2, all.x = TRUE, all.y = TRUE)
+# a = merge(a,t3, all.x = TRUE, all.y = TRUE)
+# a = merge(a,t4, all.x = TRUE, all.y = TRUE)
+# a = merge(a,t5, all.x = TRUE, all.y = TRUE)
+# a = merge(a,t6, all.x = TRUE, all.y = TRUE)
+# a = merge(a,t7, all.x = TRUE, all.y = TRUE)
+# a = merge(a,t8, all.x = TRUE, all.y = TRUE)
+# a = merge(a,t9, all.x = TRUE, all.y = TRUE)
+# a = merge(a,t10, all.x = TRUE, all.y = TRUE)
+# 
+# knitr::kable(a, format = "html", col.names = c("k","Post.Prob","Chain"), align = 'c')
+
+# Create a table:
+knit1 = knitr::kable(x = round(table(ex_1[[1]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 1")
+knit2 = knitr::kable(x = round(table(ex_1[[2]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 2")
+knit3 = knitr::kable(x = round(table(ex_1[[3]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 3")
+knit4 = knitr::kable(x = round(table(ex_1[[4]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 4")
+knit5 = knitr::kable(x = round(table(ex_1[[5]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 5")
+knit6 = knitr::kable(x = round(table(ex_1[[6]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 6")
+knit7 = knitr::kable(x = round(table(ex_1[[7]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 7")
+knit8 = knitr::kable(x = round(table(ex_1[[8]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 8")
+knit9 = knitr::kable(x = round(table(ex_1[[9]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 9")
+knit10 = knitr::kable(x = round(table(ex_1[[10]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 10")
+list_ex1_1 = list(knit1,
+     knit2,
+     knit3,
+     knit4,
+     knit5,
+     knit6,
+     knit7,
+     knit8,
+     knit9,
+     knit10)
+# print the table
+knitr::kables(list_ex1_1,format = "html")
 ```
 
-For this example, we see that an AR(10) was visited the most often across each chain. We will see this in the trace plots of all of the AR(k) coefficients:
+histogram of k
 
-Now we plot the trace plots of all AR(k) coefficients without burn-in from 1-`kmax`
+```{r echo=FALSE}
+
+# base plot version
+# plot a histogram of the posterior probabilities with burn-in included
+# hist(sapply(ex_1, FUN = function(x){x[1:iter,22]}), freq = FALSE, breaks = seq(7.5,13.5,1), xlab = "k", main = "Posterior Probabilities of k\n Across 10 Chains (no burn-in)")
+
+histex1 = sapply(ex_1, FUN = function(x){x[1:iter,22]})
+
+# ggplot version
+ggplot_number_of_clusters_hist(histex1)+
+  ggtitle("Posterior Distribution of k",
+          subtitle = TeX("$k_{initial} = k_{true}$ & burn-in not removed"))+
+  xlab("k")+
+  theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"))+
+  thar
+
+```
+
+For this example, we see that an $k=10$ was visited the most often across each chain. We will see this in the trace plots of all of the AR(k) coefficients:
+
+Now we plot the trace plots of all AR(k) coefficients without burn-in correction
 ```{r}
 bayesplot::mcmc_trace(x = ex_1, pars = lab[-c(21:22)]) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  ylim(-1,1)
+  ylim(-1,1)+
+  ggtitle(TeX("Trace Plots for $\\phi$\n with $k_{initial} = k_{true}$ & burn-in not removed"))+
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 ```
-
 Due to the many trace plots, it is somewhat difficult to determine where our burn-in should be. So, let us plot the trace plots again but restricting to only the $\phi(1)$ through $\phi(12)$ coefficients.
 
 ```{r}
-bayesplot::mcmc_trace(x = ex_1, pars = lab[1:12]) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+bayesplot::mcmc_trace(x = ex_1, pars = lab[1:12])+
+  ggtitle(TeX("Trace Plots for $\\phi$\n with $k_{initial} = k_{true}$ & burn-in not removed"))+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  thar
 ```
 
 ```{r message=FALSE, warning=FALSE}
-library(mcmcse)
-# Autocorrelation with no thinning
-mcmc_acf(ex_1, pars = lab[-c(11:20)],lags = 30)
+# library(mcmcse)
+# Autocorrelation with no thinning or burn-in
+mcmc_acf(ex_1, pars = lab[-c(11:20)],lags = 20) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 # Autocorrelation with thinning of 10
-mcmc_acf(lapply(ex_1, FUN = function(x) x[c(T, rep(F, 9)), ]), pars = lab[-c(11:20)])
+mcmc_acf(lapply(ex_1, FUN = function(x) x[c(T, rep(F, 9)), ]), pars = lab[-c(11:20)])+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
-
-
-
-
 
 
 ### Plots \emph{with} burn-in
 
-Set the variable `burnin` to be $50$. In `bayesplot` when you include `n_warmup` as an input and set it equal to `burnin` it darkens the area that is considered excluded.
+Set the variable `burnin` to be $50$. 
 
-```{r plots-with-burnin, warning=FALSE}
+```{r plots-with-burnin, message=FALSE, warning=FALSE}
 burnin = 50
 # Trace plots of sig2 and k
-bayesplot::mcmc_trace(x = ex_1,pars = lab[21:22]) + xlim(burnin+1,3000)
+bayesplot::mcmc_trace(x = ex_1,pars = lab[21:22]) + xlim(burnin+1,3000)+
+  ggtitle(TeX("Trace Plots for $\\sigma^2_{\\epsilon}$ and $k$"),
+          subtitle = TeX("$k_{initial} = k_{true}$ & burn-in removed"))+
+  thar
 ```
 
-Table of the posterior probability of `k`
-```{r}
-table(ex_1[[1]][-c(1:burnin),22])/(iter - burnin)
-table(ex_1[[2]][-c(1:burnin),22])/(iter - burnin)
-table(ex_1[[3]][-c(1:burnin),22])/(iter - burnin)
-table(ex_1[[4]][-c(1:burnin),22])/(iter - burnin)
-table(ex_1[[5]][-c(1:burnin),22])/(iter - burnin)
+Table of the posterior probability of `k` with burn-in removed
+
+```{r echo=FALSE}
+# table(ex_1[[1]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_1[[2]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_1[[3]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_1[[4]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_1[[5]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_1[[6]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_1[[7]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_1[[8]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_1[[9]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_1[[10]][-c(1:burnin),22])/(iter - burnin)
+
+# Create a table:
+knit1 = knitr::kable(x = round(table(ex_1[[1]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 1")
+knit2 = knitr::kable(x = round(table(ex_1[[2]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 2")
+knit3 = knitr::kable(x = round(table(ex_1[[3]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 3")
+knit4 = knitr::kable(x = round(table(ex_1[[4]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 4")
+knit5 = knitr::kable(x = round(table(ex_1[[5]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 5")
+knit6 = knitr::kable(x = round(table(ex_1[[6]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 6")
+knit7 = knitr::kable(x = round(table(ex_1[[7]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 7")
+knit8 = knitr::kable(x = round(table(ex_1[[8]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 8")
+knit9 = knitr::kable(x = round(table(ex_1[[9]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 9")
+knit10 = knitr::kable(x = round(table(ex_1[[10]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 10")
+list_ex1_bi = list(knit1,
+     knit2,
+     knit3,
+     knit4,
+     knit5,
+     knit6,
+     knit7,
+     knit8,
+     knit9,
+     knit10)
+# print the table
+knitr::kables(list_ex1_bi,format = "md")
 ```
 
-Now with our burn-in removed we have our posterior probabilities of $k$ across each chain. So, this algorithm was able to correctly choose the correct `k` when we give it the true `k` value to begin with, which is not a huge surprise.
+histogram of posterior probabilities of k with burn-in removed
 
-Now we can view our trace plots again:
+```{r echo=FALSE}
+# base plot version:
+# hist(sapply(ex_1, FUN = function(x){x[-c(1:burnin),22]}), freq = FALSE, breaks = seq(7.5,13.5,1), xlab = "k", main = "Posterior Probabilities of k\n Across 10 Chains")
+
+histex1bi = sapply(ex_1, FUN = function(x){x[-c(1:burnin),22]})
+
+# ggplot version
+ggplot_number_of_clusters_hist(histex1bi)+
+  ggtitle("Posterior Distribution of k",
+          subtitle = TeX("$k_{initial} = k_{true}$ & burn-in removed"))+
+  xlab("k")+
+  theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"))+
+  thar
+```
+
+Now with our burn-in removed we have our posterior probabilities of $k$ across each chain. So, this algorithm was able to 'choose' the correct `k` when we give it the true `k` value to begin with, which is not a huge surprise.
+
+Now we view our trace plots again with burn-in removed:
 
 Plot the trace plots of all the $\phi(k)$ coefficients
-```{r warning=FALSE}
-bayesplot::mcmc_trace(x = ex_1,pars = lab[-c(21,22)]) + xlim(burnin+1,iter)+
+
+```{r message=FALSE, warning=FALSE}
+bayesplot::mcmc_trace(x = ex_1,pars = lab[-c(21,22)]) + xlim(burnin+1,iter) +
   ylim(-1,1)+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  ggtitle(TeX("Trace Plots for $\\phi$\n with $k_{initial} = k_{true}$ & burn-in removed"))+
+  thar
 ```
 
-Trace plots of only AR(1) through AR(10)
-```{r warning=FALSE}
-bayesplot::mcmc_trace(x = ex_1, pars = lab[1:12]) +xlim(burnin+1,iter)+
+Trace plots of only $\phi$(1) through $\phi$(12)
+
+```{r message=FALSE, warning=FALSE}
+bayesplot::mcmc_trace(x = ex_1, pars = lab[1:12]) + xlim(burnin+1,iter)+
   ylim(-1,1)+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  ggtitle(TeX("Trace Plots for $\\phi$\n with $k_{initial} = k_{true}$ & burn-in removed"))+
+  thar
 ```
 
+Autocorrelation Plots with burn-in removed
+
+```{r message=FALSE, warning=FALSE}
+# Autocorrelation with no thinning
+mcmc_acf(lapply(ex_1, FUN = function(x) x[(burnin+1):iter,]), pars = lab[-c(11:20)], lags = 20)+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+# Autocorrelation with thinning of 10
+mcmc_acf(lapply(ex_1, FUN = function(x) x[(burnin+1):iter,][c(T, rep(F, 9)), ]), pars = lab[-c(11:20)], lags = 20)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  ggtitle("ACF (with Thinning) k_initial = k_true")+
+  theme(plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
+        axis.title.x = element_text(size=10, face="bold", colour = "black"),    
+        axis.title.y = element_text(size=10, face="bold", colour = "black"))
+```
 
 
 # Example: initial k less than true k
 
-Now we will run the example again but this time set the initial `k` value to less than the true `k` value. For this example, we chose to set `k = 5`.
+Now we will run the example again but this time set the initial `k` value to less than the true `k` value. For this example, we chose to set `k = 1`.
 
 ```{r}
 # reset the seed
 set.seed(100)
 # Set the number of iterations
-iter = 3000
+iter = 10000
 # Set the highest value k can possible take
 kmax = 20
 # Set starting value of sig2
@@ -212,31 +364,374 @@ lab = colnames(ex_2[[1]])
 
 ```{r}
 # Trace plots of sig2 and k
-bayesplot::mcmc_trace(x = ex_2, pars = lab[21:22])
+bayesplot::mcmc_trace(x = ex_2, pars = lab[21:22])+
+    ggtitle(TeX("Trace Plots for $\\sigma^2_{\\epsilon}$ and $k$"),
+          subtitle = TeX("$k_{initial} < k_{true}$ & burn-in not removed"))+
+  thar
 ```
+
+So, it obvious that when setting the initial `k` value below the true `k` value, it takes much longer for the trace plots to settle down. 
 
 We can also view the table of the posterior probability without burn-in:
-```{r}
-table(ex_2[[1]][1:iter,22])/(iter)
-table(ex_2[[2]][1:iter,22])/(iter)
-table(ex_2[[3]][1:iter,22])/(iter)
-table(ex_2[[4]][1:iter,22])/(iter)
-table(ex_2[[5]][1:iter,22])/(iter)
+```{r echo=FALSE}
+# table(ex_2[[1]][1:iter,22])/(iter)
+# table(ex_2[[2]][1:iter,22])/(iter)
+# table(ex_2[[3]][1:iter,22])/(iter)
+# table(ex_2[[4]][1:iter,22])/(iter)
+# table(ex_2[[5]][1:iter,22])/(iter)
+# table(ex_2[[6]][1:iter,22])/(iter)
+# table(ex_2[[7]][1:iter,22])/(iter)
+# table(ex_2[[8]][1:iter,22])/(iter)
+# table(ex_2[[9]][1:iter,22])/(iter)
+# table(ex_2[[10]][1:iter,22])/(iter)
+
+# Create a table:
+knit1 = knitr::kable(x = round(table(ex_2[[1]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 1")
+knit2 = knitr::kable(x = round(table(ex_2[[2]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 2")
+knit3 = knitr::kable(x = round(table(ex_2[[3]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 3")
+knit4 = knitr::kable(x = round(table(ex_2[[4]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 4")
+knit5 = knitr::kable(x = round(table(ex_2[[5]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 5")
+knit6 = knitr::kable(x = round(table(ex_2[[6]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 6")
+knit7 = knitr::kable(x = round(table(ex_2[[7]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 7")
+knit8 = knitr::kable(x = round(table(ex_2[[8]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 8")
+knit9 = knitr::kable(x = round(table(ex_2[[9]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 9")
+knit10 = knitr::kable(x = round(table(ex_2[[10]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 10")
+list_ex2 = list(knit1,
+     knit2,
+     knit3,
+     knit4,
+     knit5,
+     knit6,
+     knit7,
+     knit8,
+     knit9,
+     knit10)
+# print the table
+knitr::kables(list_ex2,format = "md")
 ```
 
-For this example, we see that an AR(10) was visited the most often across each chain. We will see this in the trace plots of all of the AR(k) coefficients:
+histogram
 
-Now we plot the trace plots of all AR(k) coefficients without burn-in from 1-`kmax`
+```{r}
+histex2 = sapply(ex_2, FUN = function(x){x[1:iter,22]})
+
+# ggplot version
+ggplot_number_of_clusters_hist(histex2)+
+  ggtitle("Posterior Distribution of k",
+          subtitle = TeX("$k_{initial} < k_{true}$ & burn-in not removed"))+
+  xlab("k")+
+  theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"))+
+  thar
+
+```
+
+Again we see that an `k = 10` was visited the most often across each chain. We will see this in the trace plots of all of the coefficients:
+
+Now we plot the trace plots of all $\phi$'s without burn-in
+
 ```{r}
 bayesplot::mcmc_trace(x = ex_2, pars = lab[-c(21:22)]) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  ylim(-1,1)
+  ylim(-1,1)+
+  ggtitle(TeX("Trace Plots for $\\phi$\n with $k_{initial} < k_{true}$ & burn-in not removed"))+
+  thar
+```
+
+## Plots with burn-in Removed
+
+For this example we need to change our burn-in to around $2000$, since that is when the trace plots across all of our parameters seem to calm down.
+
+```{r message=FALSE, warning=FALSE}
+burnin = 2000
+# Trace plots of sig2 and k
+bayesplot::mcmc_trace(x = ex_2, pars = lab[21:22]) + xlim(burnin+1,iter)+
+      ggtitle(TeX("Trace Plots for $\\sigma^2_{\\epsilon}$ and $k$"),
+          subtitle = TeX("$k_{initial} < k_{true}$ & burn-in removed"))+
+  thar
+```
+
+Posterior Probabilities of k with burn-in removed.
+
+```{r echo=FALSE}
+# table(ex_2[[1]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_2[[2]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_2[[3]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_2[[4]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_2[[5]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_2[[6]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_2[[7]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_2[[8]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_2[[9]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_2[[10]][-c(1:burnin),22])/(iter - burnin)
+
+# Create a table:
+knit1 = knitr::kable(x = round(table(ex_2[[1]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 1")
+knit2 = knitr::kable(x = round(table(ex_2[[2]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 2")
+knit3 = knitr::kable(x = round(table(ex_2[[3]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 3")
+knit4 = knitr::kable(x = round(table(ex_2[[4]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 4")
+knit5 = knitr::kable(x = round(table(ex_2[[5]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 5")
+knit6 = knitr::kable(x = round(table(ex_2[[6]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 6")
+knit7 = knitr::kable(x = round(table(ex_2[[7]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 7")
+knit8 = knitr::kable(x = round(table(ex_2[[8]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 8")
+knit9 = knitr::kable(x = round(table(ex_2[[9]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 9")
+knit10 = knitr::kable(x = round(table(ex_2[[10]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 10")
+list_ex2_bi = list(knit1,
+     knit2,
+     knit3,
+     knit4,
+     knit5,
+     knit6,
+     knit7,
+     knit8,
+     knit9,
+     knit10)
+# print the table
+knitr::kables(list_ex2_bi,format = "md")
+```
+
+Histogram of the Posterior Probability of $k$ with burn-in removed.
+
+```{r}
+# base plot version
+# hist(sapply(ex_2, FUN = function(x){x[-c(1:burnin),22]}), freq = FALSE, breaks = seq(7.5,13.5,1), xlab = "k", main = "Posterior Probabilities of k\n Across 10 Chains")
+
+histex2bi = sapply(ex_2, FUN = function(x){x[-c(1:burnin),22]})
+
+# ggplot version:
+ggplot_number_of_clusters_hist(histex2bi)+
+  ggtitle("Posterior Distribution of k",
+          subtitle = TeX("$k_{initial} < k_{true}$ & burn-in removed"))+
+  xlab("k")+
+  theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"))+
+  thar
+```
+
+Trace plots of only $\phi$(1) through $\phi$(12)
+
+```{r message=FALSE, warning=FALSE}
+bayesplot::mcmc_trace(x = ex_2, pars = lab[1:12]) +
+  xlim(burnin+1,iter)+
+  ylim(-1,1)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  ggtitle(TeX("Trace Plots for $\\phi$\n with $k_{initial} < k_{true}$ & burn-in removed"))+
+  thar
+```
+
+Autocorrelation plots with and without thinning with removing burnin
+
+```{r message=FALSE, warning=FALSE}
+# Autocorrelation with no thinning
+mcmc_acf(lapply(ex_2, FUN = function(x) x[(burnin+1):iter,]), pars = lab[-c(11:20)], lags = 20)+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+# Autocorrelation with thinning of 10
+mcmc_acf(lapply(ex_2, FUN = function(x) x[(burnin+1):iter,][c(T, rep(F, 9)), ]), pars = lab[-c(11:20)], lags = 20)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  ggtitle("ACF (with Thinning) k_initial < k_true")+
+  theme(plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
+        axis.title.x = element_text(size=10, face="bold", colour = "black"),    
+        axis.title.y = element_text(size=10, face="bold", colour = "black"))
 ```
 
 
+# Initial k is greater than true k
+
+For the final example, we run the sampler again but set the initial value of `k` to be greater than the true value of `k`
+
+```{r}
+# reset the seed
+set.seed(100)
+# Set the number of iterations
+iter = 3000
+# Set the highest value k can possible take
+kmax = 20
+# Set starting value of sig2
+sig2 = 1
+# Set starting value of k
+k = 20
+chains = 10
+ex_3 = vector(mode = "list", length = chains)
+```
+
+Now, we can call the function and save it to some variable `ex_3`.
+
+```{r}
+# Create a list of data frames to store our chains
+for(i in 1:chains){
+  ex_3[[i]]=rjmcmc_nested(iter = iter,k = k,sig2 = 1,x = x,kmax = kmax)
+}
+# extract the labels names
+lab = colnames(ex_3[[1]])
+
+```
+
+# Diagnostic Plots : Initial k greater than true k
+
+Trace plots with no removal of the burn-in period
+
+```{r}
+# Trace plots of sig2 and k
+bayesplot::mcmc_trace(x = ex_3, pars = lab[21:22])+
+      ggtitle(TeX("Trace Plots for $\\sigma^2_{\\epsilon}$ and $k$"),
+          subtitle = TeX("$k_{initial} > k_{true}$ & burn-in not removed"))+
+  thar
+```
+
+We also view the table of the posterior probabilities for `k` without the removal of the burn-in period:
+
+```{r echo=FALSE}
+# table(ex_3[[1]][1:iter,22])/(iter)
+# table(ex_3[[2]][1:iter,22])/(iter)
+# table(ex_3[[3]][1:iter,22])/(iter)
+# table(ex_3[[4]][1:iter,22])/(iter)
+# table(ex_3[[5]][1:iter,22])/(iter)
+# table(ex_3[[6]][1:iter,22])/(iter)
+# table(ex_3[[7]][1:iter,22])/(iter)
+# table(ex_3[[8]][1:iter,22])/(iter)
+# table(ex_3[[9]][1:iter,22])/(iter)
+# table(ex_3[[10]][1:iter,22])/(iter)
+
+# Create a table:
+knit1 = knitr::kable(x = round(table(ex_3[[1]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 1")
+knit2 = knitr::kable(x = round(table(ex_3[[2]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 2")
+knit3 = knitr::kable(x = round(table(ex_3[[3]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 3")
+knit4 = knitr::kable(x = round(table(ex_3[[4]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 4")
+knit5 = knitr::kable(x = round(table(ex_3[[5]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 5")
+knit6 = knitr::kable(x = round(table(ex_3[[6]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 6")
+knit7 = knitr::kable(x = round(table(ex_3[[7]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 7")
+knit8 = knitr::kable(x = round(table(ex_3[[8]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 8")
+knit9 = knitr::kable(x = round(table(ex_3[[9]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 9")
+knit10 = knitr::kable(x = round(table(ex_3[[10]][1:iter,22])/(iter),4), format = "html",col.names = c("k","Post.Prob."),caption = "chain 10")
+list_ex3 = list(knit1,
+     knit2,
+     knit3,
+     knit4,
+     knit5,
+     knit6,
+     knit7,
+     knit8,
+     knit9,
+     knit10)
+# print the table
+knitr::kables(list_ex3,format = "html")
+```
+
+Histogram
+
+```{r}
+histex3 = sapply(ex_3, FUN = function(x){x[1:iter,22]})
+
+# ggplot version
+ggplot_number_of_clusters_hist(histex3)+
+  ggtitle("Posterior Distribution of k",
+          subtitle = TeX("$k_{initial} > k_{true}$ & burn-in not removed"))+
+  xlab("k")+
+  theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"))+
+  thar
+
+```
 
 
-# Initial k
+Again we see that $k = 10$ was visited the most often across each chain. We will see this in the trace plots of all of the $\phi$ coefficients:
+
+Now we plot the trace plots of all AR(k) coefficients without burn-in removed
+```{r}
+bayesplot::mcmc_trace(x = ex_3, pars = lab[-c(21:22)]) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  ylim(-1,1)+
+  ggtitle(TeX("Trace Plots for $\\phi$\n with $k_{initial} > k_{true}$ & burn-in not removed"))+
+  thar
+```
+
+## Plots with Burn-In Removed
+
+```{r message=FALSE, warning=FALSE}
+burnin = 50
+# Trace plots of sig2 and k
+bayesplot::mcmc_trace(x = ex_3, pars = lab[21:22]) +
+  xlim(burnin+1,iter)+
+  ggtitle(TeX("Trace Plots for $\\sigma^2_{\\epsilon}$ and $k$"),
+          subtitle = TeX("$k_{initial} > k_{true}$ & burn-in removed"))+
+  thar
+```
+
+Posterior Probabilities of `k` with burn-in period removed.
+
+```{r echo=FALSE}
+# table(ex_3[[1]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_3[[2]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_3[[3]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_3[[4]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_3[[5]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_3[[6]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_3[[7]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_3[[8]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_3[[9]][-c(1:burnin),22])/(iter - burnin)
+# table(ex_3[[10]][-c(1:burnin),22])/(iter - burnin)
+
+# Create a table:
+knit1 = knitr::kable(x = round(table(ex_3[[1]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 1")
+knit2 = knitr::kable(x = round(table(ex_3[[2]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 2")
+knit3 = knitr::kable(x = round(table(ex_3[[3]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 3")
+knit4 = knitr::kable(x = round(table(ex_3[[4]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 4")
+knit5 = knitr::kable(x = round(table(ex_3[[5]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 5")
+knit6 = knitr::kable(x = round(table(ex_3[[6]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 6")
+knit7 = knitr::kable(x = round(table(ex_3[[7]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 7")
+knit8 = knitr::kable(x = round(table(ex_3[[8]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 8")
+knit9 = knitr::kable(x = round(table(ex_3[[9]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 9")
+knit10 = knitr::kable(x = round(table(ex_3[[10]][-c(1:burnin),22])/(iter),4), format = "html",col.names = c("k","Post.Prob."), caption = "chain 10")
+list_ex3_bi = list(knit1,
+     knit2,
+     knit3,
+     knit4,
+     knit5,
+     knit6,
+     knit7,
+     knit8,
+     knit9,
+     knit10)
+# print the table
+knitr::kables(list_ex3_bi,format = "md")
+
+```
+
+Histogram of the posterior probabilities of `k` with burn-in removed.
+
+```{r}
+histex3bi = sapply(ex_3, FUN = function(x){x[-c(1:burnin),22]})
+
+# ggplot version:
+ggplot_number_of_clusters_hist(histex3bi)+
+  ggtitle("Posterior Distribution of k",
+          subtitle = TeX("$k_{initial} > k_{true}$ & burn-in removed"))+
+  xlab("k")+
+  theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"))+
+  thar
+```
+
+Trace plots of only $\phi$(1) through $\phi$(12)
+```{r message=FALSE, warning=FALSE}
+bayesplot::mcmc_trace(x = ex_3, pars = lab[1:12]) +xlim(burnin+1,iter)+
+  ylim(-1,1)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  ggtitle(TeX("Trace Plots for $\\phi$\n with $k_{initial} > k_{true}$ & burn-in removed"))+
+  thar
+```
+
+```{r message=FALSE, warning=FALSE}
+# Autocorrelation with no thinning
+mcmc_acf(lapply(ex_3, FUN = function(x) x[(burnin+1):iter,]), pars = lab[-c(11:20)], lags = 20)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+# Autocorrelation with thinning of 10
+mcmc_acf(lapply(ex_3, FUN = function(x) x[(burnin+1):iter,][c(T, rep(F, 9)), ]), pars = lab[-c(11:20)], lags = 20)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  ggtitle("ACF (with Thinning) k_initial > k_true")+
+  theme(plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
+        axis.title.x = element_text(size=10, face="bold", colour = "black"),    
+        axis.title.y = element_text(size=10, face="bold", colour = "black"))
+```
+
+# Investigating Initial k Further
+
+In this section we investigate how many iterations does it take for the sampler to hit the first instance of $k=10$ when given different initial starting values of $k$.
 
 ```{r}
 
@@ -250,7 +745,9 @@ kmax = 20
 sig2 = 1
 # Set possible starting values of k
 k_seq = 1:kmax
-chains = 5
+# Set number of chains for simulations
+chains = 10
+# Create list to store outputs across the chains
 ex_k = vector(mode = "list", length = chains)
 # stores the time when chain hits true k
 first_tk = matrix(NA,nrow = kmax, ncol = chains)
@@ -267,13 +764,31 @@ for(k in k_seq){
 
 
 ```{r}
-plot(x = rep(k_seq,chains), y = c(first_tk),
+plot(x = rep(k_seq,chains), y = c(first_tk), pch = 10, cex = 1, lwd = 3,
      xaxt = "n",
      ylab = "Iterations",
      xlab = "Initial k",
      main = "How Many Iterations Until k = 10 Is First Accepted")
 axis(1, at = 1:20)
 
+# ggplot version
+df_first_tk = as.data.frame(first_tk,
+                            row.names = c("k=1","k=2","k=3","k=4","k=5","k=6","k=7","k=8","k=9","k=10","k=11",
+                                          "k=12","k=13","k=14","k=15", "k=16","k=17","k=18","k=19","k=20"))
+names(df_first_tk) = c("chain_1","chain_2","chain_3","chain_4","chain_5","chain_6","chain_7","chain_8","chain_9","chain_10")
+df_first_tk$k_value = seq(1:kmax)
+
+# change dataframe to be in long form
+df_long <- tidyr::pivot_longer(df_first_tk, !k_value, names_to = "chains", values_to = "first_iter")
+df_long
+
+# plot
+ggplot(data = df_long, aes(x = k_value,y = first_iter))+
+  geom_point()+
+  scale_x_continuous(name="Initial K", limits=c(1, 20),breaks = seq(0,20)) +
+  scale_y_continuous(name="First Iteration", limits=c(0, 3000), breaks = seq(0,3000,500))+
+  ggtitle("How Many Iterations Until k = 10 Is First Accepted")+
+  thar
 
 ```
 
