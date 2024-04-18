@@ -1,6 +1,6 @@
 Package: rjmc
 Title: rjmcmc sampler for nested AR time series
-Version: 0.0.1
+Version: 1.0.0
 Authors@R: 
     person("Rebecca", "Lee", , "llrebecca21@tamu.edu", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
