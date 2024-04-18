@@ -16,7 +16,9 @@ Imports:
     stats,
     Rdpack,
     latex2exp,
-    tip
+    tip,
+    ggplot2,
+    tidyr
 Suggests: 
     knitr,
     rmarkdown

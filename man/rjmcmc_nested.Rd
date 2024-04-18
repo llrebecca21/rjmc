@@ -7,19 +7,19 @@
 rjmcmc_nested(iter, k, sig2, x, kmax, alpha_p = 2, beta_p = 1)
 }
 \arguments{
-\item{iter}{:int}
+\item{iter}{:int number of iterations for a single simulation}
 
-\item{k}{:int}
+\item{k}{:int initial value for the k parameter}
 
-\item{sig2}{:num}
+\item{sig2}{:float initial value for sig2 parameter}
 
-\item{x}{: vec}
+\item{x}{: vector (Tmax x 1) of data from the time series}
 
-\item{kmax}{: int}
+\item{kmax}{: integer value > 1: max value of k can potentially move to}
 
-\item{alpha_p}{:int}
+\item{alpha_p}{:float shape parameter for  for inverse gamma prior on sig2}
 
-\item{beta_p}{:int}
+\item{beta_p}{:float scale parameter for inverse gamma prior on sig2}
 }
 \value{
 matrix with parameters a, k, and sig2
