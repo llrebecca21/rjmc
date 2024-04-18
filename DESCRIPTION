@@ -3,7 +3,7 @@ Title: rjmcmc sampler for nested AR time series
 Version: 1.0.0
 Authors@R: 
     person("Rebecca", "Lee", , "llrebecca21@tamu.edu", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           comment = c(ORCID = "0000-0001-8162-6555"))
 Description: This package implements the Example 1.2 from Robert and Casella's Efficient Construction of reversible jump Markov chain Monte Carlo proposal distributions (2003) and using inputs found in Example 2.7 in Godsill's "On the Relationship Between Markov Chain Monte Carlo Methods for Model Uncertainty" (2001).
 License: GPL (>= 3)
 Encoding: UTF-8
