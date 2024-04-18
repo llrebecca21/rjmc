@@ -6,7 +6,8 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of rjmc is
+The goal of rjmc is to implement an example of RJMCMC for nested AR
+models.
 
 ## Installation
 
@@ -17,6 +18,26 @@ You can install the development version of rjmc from
 # install.packages("devtools")
 devtools::install_github("llrebecca21/rjmc")
 ```
+
+To run the vignette it is also recommended to install, load, and update
+the following libraries:
+
+``` r
+library(bayesplot) # for plotting trace plots
+library(ggplot2) # for altering plots produced by bayesplot
+library(latex2exp) # for including latex in plot titles
+library(knitr) # for creating nice looking tables
+library(tip) # for plotting posterior probabilities in ggplot
+library(tidyr) # for data wrangling 
+```
+
+## Vignette
+
+A vignette is available that walks through the example seen here in more
+detail as well as 3 other scenarios for different initial values of `k`.
+To run the vignette, either take the .Rmd file from the github repo for
+`rjmc` package in the vignettes folder, or install the `rjmc` package as
+above but with the `build_vignettes = TRUE` option stated.  
 
 ## Example
 
@@ -144,7 +165,7 @@ bayesplot::mcmc_trace(x = ex_1, pars = lab[1:12]) + xlim(burnin+1,iter)+
 Looking at just the AR(1) through AR(10) trace plots (in base plot) we
 can overlay them with a horizontal line of the true AR coefficients.
 
-# Plots with burn-in removed
+# Plots of Bayes Estimator Residual with burn-in removed
 
 ``` r
 par(mfrow = c(2,5), mar = c(2,2,1,1))
