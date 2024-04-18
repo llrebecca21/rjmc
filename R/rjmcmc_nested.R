@@ -1,12 +1,12 @@
 #' Runs the rjmcmc algorithm
 #'
-#' @param iter :int
-#' @param k :int
-#' @param sig2 :num
-#' @param x : vec
-#' @param kmax : int
-#' @param alpha_p :int
-#' @param beta_p :int
+#' @param iter :int number of iterations for a single simulation
+#' @param k :int initial value for the k parameter
+#' @param sig2 :float initial value for sig2 parameter
+#' @param x : vector (Tmax x 1) of data from the time series
+#' @param kmax : integer value > 1: max value of k can potentially move to 
+#' @param alpha_p :float shape parameter for  for inverse gamma prior on sig2
+#' @param beta_p :float scale parameter for inverse gamma prior on sig2
 #' 
 #' @references 
 #' \insertRef{brooks_efficient_2003}{rjmc}
