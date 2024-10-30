@@ -1,12 +1,16 @@
-#' Runs the rjmcmc algorithm
-#'
-#' @param iter :int number of iterations for a single simulation
-#' @param k :int initial value for the k parameter
-#' @param sig2 :float initial value for sig2 parameter
-#' @param x : vector (Tmax x 1) of data from the time series
-#' @param kmax : integer value > 1: max value of k can potentially move to 
-#' @param alpha_p :float shape parameter for  for inverse gamma prior on sig2
-#' @param beta_p :float scale parameter for inverse gamma prior on sig2
+#' A Reversible Jump Markov Chain Monte Carlo (RJMCMC) for Nested AR Processes
+#' 
+#' @description 
+#' `rjmcmc()` performs a nested RJMCMC algorithm on a given time series.
+#' 
+#' 
+#' @param iter A numeric value for the number of iterations for a single simulation.
+#' @param k An integer for the initial value for the k parameter.
+#' @param sig2 The numeric initial value for the `sig2` parameter.
+#' @param x A vector `(Tmax` \eqn{\times} `1)` of data from the time series.
+#' @param kmax An integer value > 1: max value of k can potentially move to. 
+#' @param alpha_p The float shape parameter for inverse gamma prior on `sig2`.
+#' @param beta_p The float scale parameter for inverse gamma prior on `sig2`.
 #' 
 #' @references 
 #' \insertRef{brooks_efficient_2003}{rjmc}
@@ -15,7 +19,7 @@
 #' 
 #' \insertRef{robert_monte_2004}{rjmc}
 #' 
-#' @return matrix with parameters a, k, and sig2
+#' @return A matrix with parameters `a`, `k`, and `sig2`.
 #' @export
 #'
 #' @examples

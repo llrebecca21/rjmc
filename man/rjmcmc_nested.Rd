@@ -13,7 +13,7 @@ rjmcmc_nested(iter, k, sig2, x, kmax, alpha_p = 2, beta_p = 1)
 
 \item{sig2}{:float initial value for sig2 parameter}
 
-\item{x}{: vector (Tmax x 1) of data from the time series}
+\item{x}{: vector \verb{(Tmax} \eqn{\times} \verb{1)} of data from the time series}
 
 \item{kmax}{: integer value > 1: max value of k can potentially move to}
 
@@ -25,7 +25,7 @@ rjmcmc_nested(iter, k, sig2, x, kmax, alpha_p = 2, beta_p = 1)
 matrix with parameters a, k, and sig2
 }
 \description{
-Runs the rjmcmc algorithm
+\insertCite{brooks_efficient_2003}{rjmc}
 }
 \examples{
 ## will add soon
